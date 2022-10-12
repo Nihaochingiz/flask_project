@@ -7,27 +7,8 @@ app = Flask(__name__)
 
 
 def log_request(req: 'flask_request', res: str) -> None:
-    dbconfig = {
-    'host':'localhost',
-    'user':'root',
-    'password':'ultimathule1861',
-    'database':'vsearchlogDB    ',
-}
-    conn = mysql.connector.connect(**dbconfig)
-    cursor = conn.cursor()
-    _SQL = """insert into  log(
-    phrase, letters, ip, browser_string, results)
-    values
-    (%s,%s,%s,%s,%s)"""
-    cursor.execute(_SQL, (req.form['phrase'],
-                        req.form['letters'],
-                        req.remote_addr,
-                        req.user_agent.browser,
-                        res, ))
-                        
-    conn.commit()
-    cursor.close()
-    conn.close()
+    with open('vsearchlog', 'a') as log:
+        print(req, res, file = log)
 
 @app.route('/search4', methods = ['POST'])
 
@@ -49,18 +30,5 @@ def entry_page() -> 'html':
     return render_template('entry.html',
                              the_title = 'Welcome to search4letters on the web!')
 
-@app.route('/viewlog')
-def view_the_log()-> str:
-    contents = []
-    with open('vsearchlog') as log:
-        for line in log:
-            contents.append([])
-            for item in line.split('|'):
-                contents[-1].append(escape(item))
-    titles = ('Form Data', 'Remote_addr','User_agent','Results')
-    return render_template('viewlog.html',
-    the_title = 'View log',
-    the_row_titles =titles,
-    the_data = contents,)
 if __name__ == '__main__':
     app.run(debug=True)
