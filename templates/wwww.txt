@@ -1,0 +1,4 @@
+def do_search() -> str :
+    phrase = request.form['phrase']
+    letters = request.form['letters']
+    return str(search4letters(phrase,letters))
